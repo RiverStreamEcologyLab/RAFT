@@ -1,0 +1,102 @@
+Reach Affinity Tool (RAFT) 
+
+Input Format
+RAFT requires a comma-delimited text file that includes the following fields (i.e. columns). This reflects the structure of the modified (i.e. appended) Arc Hydro Drainage Line feature class table.
+------------------------------------------------------------------------------------------
+Field Name	Description
+------------------------------------------------------------------------------------------
+OBJECTID	Sequential integer unique identifier
+Arcid		Sequential integer unique identifier
+from_node	The network node identifier at which the reach originates
+to_node		The network node identifier at which the reach terminates
+Shape_Leng	The length of the reach
+HydroID		Unique Arc Hydro database identifier
+GridID		Unique Arc Hydro database identifier (primary key for joining output tables)
+NextDownID	The HydroID of the next downstream neighbouring reach
+DrainID		The HydroID of the catchment corresponding to the drainage line
+virtual		An integer code that indicates the type of reach: Real Reach = 0; Virtual (Lake) Reach = 1; Virtual Shoreline = 2
+UCA		Upstream Catchment Area for the reach (inclusive)
+Attribute 1	1st reach attribute
+Attribute 2	2nd reach attribute
+...
+Attribute n	nth reach attribute
+*The input attributes should all be range scaled to values between 0 and 1 or 0 and 100 according to the method outlined in Legendre and Legendre (2012). This resolves Euclidean Distance calculation issues when the input variables have different domains (e.g. Temperature 0 to 30ºC; Percent upstream clay geology 0 to 100%; Channel slope 0 to 15%). Null values are not permitted.
+ 
+
+Output Format
+RAFT writes the results to a MS-Excel workbook. The workbook contains 5 worksheets. The contents of each sheet are outlined below:
+
+SegmentReaches: This sheet relates to individual reaches and their attributes. Each record (i.e. row) represents a reach in the network.
+------------------------------------------------------------------------------------------
+Field Name	Description
+------------------------------------------------------------------------------------------
+SegmentID	Unique integer segment identifier as assigned by RAFT
+GridID		Unique integer reach identifier (foreign key for joining back to spatial data)
+Attribute 1	Value of the 1st attribute
+Attribute 2	Value of the 2nd attribute
+...
+Attribute n	Value of the nth attribute
+Strahler	Strahler Order
+Shreve		Shreve Order
+UCA		Upstream Catchment Area
+LakeInfluence	Boolean value indicating whether a reach is considered lake influenced, 1 = TRUE; 0 = FALSE
+Virtual		Integer code indicating the type of reach: Real Reach = 0; Virtual (Lake) Reach = 1; Virtual Shoreline = 2
+
+
+SegmentSummaries: This sheet relates to summaries of all the reaches that comprise a segment. Each record (i.e.row) in the table represents a segment cluster. Summary statitics are currently hard-coded as segment means. 
+------------------------------------------------------------------------------------------
+Field Name		Description
+------------------------------------------------------------------------------------------
+SegmentID		Unique integer segment identifier as assigned by RAFT
+min_Attribute 1		Segment minimum of 1st attribute
+min_Attribute 2		Segment minimum of 2nd attribute
+...
+min_Attribute n		Segment minimum of nth attribute
+mean_Attribute 1	Segment average of 1st attribute
+mean_Attribute 2	Segment average of 2nd attribute
+...
+mean_Attribute n	Segment average of nth attribute
+median_Attribute 1	Segment median of 1st attribute
+median_Attribute 2	Segment median of 2nd attribute
+...
+median_Attribute n	Segment median of nth attribute
+max_Attribute 1		Segment maximum of 1st attribute
+max_Attribute 2		Segment maximum of 2nd attribute
+...
+max_Attribute n		Segment maximum of nth attribute
+minStrahler		the smallest Strahler order reach within the segment
+medianStrahler		the median Strahler order within the segment
+maxStrahler		the largest Strahler order reach within the segment
+minShreve		the smallest Shreve order reach within the segment
+medianShreve		the median Shreve order within the segment
+maxShreve		the largest Shreve order reach within the segment
+minUCA			the smallest upstream catchment area within the segment
+meanUCA			the average upstream catchment area of reaches within the segment
+maxUCA			the largest upstream catchment area reach within the segment
+LakeInfluence		Boolean value indicating whether a segment is influenced by a lake
+Virtual			Integer code indicating the type of segment: Real Segment = 0; Virtual (Lake) Segment = 1; Virtual Shoreline Segment = 2
+
+
+Neighborhoods: This sheet identifies which size neighbourhood each reach belongs to.
+------------------------------------------------------------------------------------------
+Field Name	Description
+------------------------------------------------------------------------------------------
+GridID		Unique integer reach identifier (foreign key for joining back to spatial data)
+NeighbourhoodID	Unique neighbourhood identifier
+
+
+Distances: This sheet contains the global (absolute) and local (relative) Euclidean Distances between reaches within a segment. 
+------------------------------------------------------------------------------------------
+Field Name	Description
+------------------------------------------------------------------------------------------
+GridID		Unique integer reach identifier (foreign key for joining back to spatial data)
+SegmentID	Unique segment identifier
+GlobalDistance	The actual attribute Euclidean Distance value of a reach to the other reaches within each segment. The minimum for SLINK, mean for UPGMA or maximum for CLINK.
+LocalDistance	The relative (range-scaled) distance of the reach within each segment (0 = most similar and 1 = most dissimilar)
+
+
+Settings: A summary of all GUI parameters, thresholds and file names used during the analysis.
+ 
+References:
+Legendre P. and L. Legendre. 2012. Numerical Ecology (Third Edition). Elsevier Press, Amsterdam, NL. 990 pp.
+
